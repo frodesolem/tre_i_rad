@@ -106,6 +106,7 @@ class GameScene: SKScene {
         
         saveClick(node)
         
+        
         }
     
     
@@ -116,8 +117,13 @@ class GameScene: SKScene {
             myLabel.text = "Hej"
             return true
         }
-        
-        return false
+        else if (squares[0] == 1) && (squares[1] == 1) && (squares[2] == 1) {
+            myLabel.text = "Hej"
+            return true
+        }
+        else {
+            return false
+        }
     }
     
     
