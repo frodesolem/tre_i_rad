@@ -10,6 +10,7 @@ import SpriteKit
 import GameplayKit
 
 let myLabel = SKLabelNode(fontNamed:"Helvetica")
+let frodeLabel = SKLabelNode(fontNamed:"Helvetica")
 
 let squareSize = CGFloat(80)
 let squareSpacing = squareSize + CGFloat(5)
@@ -18,6 +19,7 @@ let playerOneColor = UIColor.lightGray
 let playerTwoColor = UIColor.black
 
 var isPlayerOne = true
+var isGameOver = false
 var gameSquares = [CGPoint?](repeating: nil, count: 9)
 var playerOneSquares = [0,0,0,0,0,0,0,0,0]
 var playerTwoSquares = [0,0,0,0,0,0,0,0,0]
@@ -37,21 +39,23 @@ class GameScene: SKScene {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
        /* Called when a touch begins */
         
-        myLabel.text = "Hello"
-        
-        // Check if a square has been touched
-        for touch in touches {
-            let location = touch.location(in: self)
-            let node : SKNode = self.atPoint(location)
-            
-            let index = node.name?.characters.index(of: "-")
-            if (index != nil) {
-                if node.name?.substring(to: (node.name?.characters.index(of: "-"))!) == "grid" {
-                    myLabel.text = node.name!
-                    
-                    placeSquare(node)
+        if isGameOver {
+            restart()
+        }
+        else {
+            // Check if a square has been touched
+            for touch in touches {
+                let location = touch.location(in: self)
+                let node : SKNode = self.atPoint(location)
+                
+                let index = node.name?.characters.index(of: "-")
+                if (index != nil) {
+                    if node.name?.substring(to: (node.name?.characters.index(of: "-"))!) == "grid" {
+                        placeSquare(node)
+                    }
                 }
             }
+            
         }
 
     }
@@ -102,23 +106,53 @@ class GameScene: SKScene {
         self.addChild(square)
         
         placedSquares += 1
-        isPlayerOne = !isPlayerOne
         
         saveClick(node)
         
-        
+        // did player 1 win?
+        if checkIfWinner(playerOneSquares) {
+            myLabel.text = "Player 1 wins!"
+            isGameOver = true
         }
+        // did player 2 win?
+        else if checkIfWinner(playerTwoSquares) {
+            myLabel.text = "Player 2 wins!"
+            isGameOver = true
+        }
+        else if placedSquares == 9 {
+            myLabel.text = "Draw!"
+            isGameOver = true
+        }
+        
+        isPlayerOne = !isPlayerOne
+        
+    }
     
-    
-    func checkWinner(_ squares: [NSInteger]) -> Bool {
+    func checkIfWinner(_ squares: [NSInteger]) -> Bool {
         //
         
         if (squares[0] == 1) && (squares[1] == 1) && (squares[2] == 1) {
-            myLabel.text = "Hej"
             return true
         }
-        else if (squares[0] == 1) && (squares[1] == 1) && (squares[2] == 1) {
-            myLabel.text = "Hej"
+        else if (squares[0] == 1) && (squares[3] == 1) && (squares[6] == 1) {
+            return true
+        }
+        else if (squares[0] == 1) && (squares[4] == 1) && (squares[8] == 1) {
+            return true
+        }
+        else if (squares[1] == 1) && (squares[4] == 1) && (squares[7] == 1) {
+            return true
+        }
+        else if (squares[3] == 1) && (squares[4] == 1) && (squares[5] == 1) {
+            return true
+        }
+        else if (squares[6] == 1) && (squares[7] == 1) && (squares[8] == 1) {
+            return true
+        }
+        else if (squares[0] == 2) && (squares[5] == 1) && (squares[8] == 1) {
+            return true
+        }
+        else if (squares[2] == 1) && (squares[4] == 1) && (squares[6] == 1) {
             return true
         }
         else {
@@ -153,13 +187,23 @@ class GameScene: SKScene {
         // Restart the game
         
         self.removeAllChildren()
+        isGameOver = false
+        isPlayerOne = true
         
-        myLabel.text = "Hello player"
+        // Place the game text
+        myLabel.text = "Touch a square"
         myLabel.fontSize = 47
         myLabel.fontColor = UIColor.darkGray
         myLabel.position = CGPoint(x:self.frame.midX, y:self.frame.midY+200)
-        
         self.addChild(myLabel)
+        
+        // Place Frode text
+        frodeLabel.text = "Made by Frode Solem, 2017"
+        frodeLabel.fontSize = 10
+        frodeLabel.fontColor = UIColor.black
+        frodeLabel.position = CGPoint(x:self.frame.midX, y:20)
+        self.addChild(frodeLabel)
+        
         
         drawBoard()
         
